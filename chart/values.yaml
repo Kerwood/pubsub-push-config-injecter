@@ -1,0 +1,16 @@
+controller:
+  image: kerwood/push-config-injecter
+  tag: latest
+  logLevel: info
+
+  # If this is set, the secret will be mounted.
+  tlsSecretName: null
+
+webhook:
+  # Below CA will be used on the webhook configuration.
+  # ca: |
+  #   -----BEGIN CERTIFICATE-----
+  #   MIIFLDCCAxSgAwIBAgIUeAaHLIAJMPnYHeh4rUE17sz9GpEwDQYJKoZIhvcNAQEL
+  #   BQAwGDEWMBQGA1UEAwwNbGludXhibG9nLnh5ejAeFw0yMzAzMjExNTQyMzJaFw0z
+  #   ....
+

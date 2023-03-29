@@ -1,0 +1,34 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: MutatingWebhookConfiguration
+metadata:
+  name: pubsub-push-config-injecter
+webhooks:
+  - name: push-config-injecter.{{ .Release.Namespace }}.svc
+    clientConfig:
+      {{- if (.Values.webhook).ca }}
+      caBundle: {{ .Values.webhook.ca | b64enc }}
+      {{- else }}
+      caBundle: {{ .Files.Get "ca/ca.crt" | b64enc }}
+      {{- end }}
+      service:
+        name: push-config-injecter
+        namespace: {{ .Release.Namespace }}
+        port: 443
+        path: "/mutate"
+    failurePolicy: Fail
+    rules:
+      - operations:
+          - "CREATE"
+          - "UPDATE"
+        apiGroups:
+          - "pubsub.cnrm.cloud.google.com"
+        apiVersions:
+          - "v1beta1"
+        resources:
+          - "pubsubsubscriptions"
+        scope: "Namespaced"
+    sideEffects: None
+    admissionReviewVersions: ["v1beta1", "v1"]
+    namespaceSelector:
+      matchLabels:
+        pubsub-push-config-injecter: enabled

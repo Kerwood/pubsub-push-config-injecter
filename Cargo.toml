@@ -1,0 +1,26 @@
+[package]
+name = "push-config-injecter"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+kube = { version = "0.80.0", features = ["admission", "rustls-tls"] }
+k8s-openapi = { version = "0.17.0", features = ["v1_26"] }
+actix-rt = "2.8.0"
+actix-web = { version = "4", features = ["rustls"] }
+anyhow = "1.0.69"
+log = "0.4.17"
+serde_json = "1.0.94"
+rcgen = { version ="0.10.0", features = ["pem", "x509-parser"]}
+env_logger = "0.10.0"
+openssl = { version = "0.10", features = ["vendored"] }
+json-patch = "0.3.0"
+rustls = "0.20"
+rustls-pemfile = "1.0.2"
+
+[profile.release]
+lto = true
+opt-level = "z"
+codegen-units = 1

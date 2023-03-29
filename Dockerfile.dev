@@ -1,0 +1,8 @@
+FROM debian:sid-slim
+
+RUN mkdir /app
+WORKDIR /app
+COPY target/debug/push-config-injecter /app
+COPY certs /app/certs
+
+CMD ["./push-config-injecter"]

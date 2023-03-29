@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: push-config-injecter-controller
+spec:
+  selector:
+    matchLabels:
+      app: push-config-injecter-controller
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: push-config-injecter-controller
+    spec:
+      serviceAccountName: pubsub-push-config-controller
+      containers:
+        - name: injecter
+          image: "{{ .Values.controller.image }}:{{ .Values.controller.tag }}"
+          resources:
+            requests:
+              cpu: 200m
+              memory: 100Mi
+          ports:
+            - containerPort: 8443
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8443
+              scheme: HTTPS
+          env:
+            - name: RUST_LOG
+              value: "push_config_injecter={{ .Values.controller.logLevel }}"
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          {{- if (.Values.controller).tlsSecretName }}
+          volumeMounts:
+            - name: push-config-injecter-certs
+              mountPath: /certs
+              readOnly: true
+          {{- end }}
+      {{- if (.Values.controller).tlsSecretName }}
+      volumes:
+        - name: push-config-injecter-certs
+          secret:
+            secretName: {{ .Values.controller.tlsSecretName }}
+      {{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: push-config-injecter
+spec:
+  selector:
+    app: push-config-injecter-controller
+  ports:
+    - name: https
+      port: 443
+      targetPort: 8443
