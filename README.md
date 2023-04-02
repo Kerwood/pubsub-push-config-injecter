@@ -1,7 +1,7 @@
 # PubSub Push Config Injecter
 [![forthebadge made-with-rust](http://ForTheBadge.com/images/badges/made-with-rust.svg)](https://www.rust-lang.org/)
 
-![Image Size](https://ghcr-badge.egpl.dev/kerwood/push-config-injecter/size?tag=latest)
+![Image Size](https://ghcr-badge.egpl.dev/kerwood/pubsub-push-config-injecter/size?tag=latest)
 
 When deploying a Google Cloud PubSubSubscription with a pushConfig using Config Connector in GKE the pushConfig endpoint can contain credentials of some sort.
 This little application is a Kubernetes Admission Controller that mutates the PubSubSubscription object and injects the pushConfig endpoint from a secret.

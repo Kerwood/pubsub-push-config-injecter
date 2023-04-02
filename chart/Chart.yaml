@@ -1,4 +1,4 @@
 apiVersion: v2
 name: pubsub-push-config-injecter
 description: Admission controller for injeting a pushConfig endpoint on a PubSub Subscription.
-version: 0.1.0
+version: 0.1.17

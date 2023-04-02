@@ -1,13 +1,11 @@
-
-
 name: Build and Release
 
 on:
   push:
     branches:
-      - '!*'
+      - "!*"
     tags:
-      - 'v*'
+      - "v*"
 
 env:
   CARGO_TERM_COLOR: always
@@ -23,6 +21,7 @@ jobs:
       - run: cargo fmt -- --check
 
   build-and-push-image:
+    name: Build OCI image and push
     needs: rustfmt
     runs-on: ubuntu-latest
     permissions:
@@ -54,3 +53,16 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: |
             org.opencontainers.image.source=https://github.com/kerwood/pubsub-push-config-injecter
+
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ncipollo/release-action@v1
+        with:
+          body: "Image name: `ghcr.io/kerwood/pubsub-push-config-injecter:${{ github.ref_name }}`"
+          generateReleaseNotes: true
+          makeLatest: true
