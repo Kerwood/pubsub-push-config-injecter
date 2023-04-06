@@ -1,6 +1,6 @@
 controller:
   image: ghcr.io/kerwood/pubsub-push-config-injecter
-  tag: latest
+  tag: v1.0.0
   logLevel: info
 
   # If this is set, the secret will be mounted.
