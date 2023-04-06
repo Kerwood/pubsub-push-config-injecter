@@ -15,27 +15,28 @@ All you have to do is:
 ## Prerequisites
 
 For deploying:
- - Helm
- - Kubectl
+ - Helm, <https://helm.sh/docs/intro/install/>
+ - Kubectl, <https://kubernetes.io/docs/tasks/tools/>
 
 For developing
- - Kind
- - Teleprecense
- - Rust
- - OpenSSL
- - Just
+ - Kind, <https://kind.sigs.k8s.io/docs/user/quick-start/>
+ - Teleprecense, <https://www.getambassador.io/docs/telepresence/latest/install>
+ - Rust, <https://www.rust-lang.org/tools/install>
+ - Just, <https://github.com/casey/just>
+ - OpenSSL 
 
 
 ## Install with default CA certificates
 
+Add the Helm repository and update.
 ```sh
-helm repo add some-url-here
+helm repo add kerwood https://kerwood.github.io/helm-charts
 helm repo update
 ```
 
 Install the Push Config Injecter.
 ```sh
-helm install push-config-injecter push-config-injecter \
+helm install push-config-connector kerwood/pubsub-push-config-injecter \
   --namespace <your-namespace>
 ```
 
@@ -53,9 +54,15 @@ kubectl create secret tls push-config-injecter-certs \
   --key=./certs/ca.key
 ```
 
+Add the Helm repository and update.
+```sh
+helm repo add kerwood https://kerwood.github.io/helm-charts
+helm repo update
+```
+
 Install with Helm and set the `tlsSecretName` and `webhook.ca`.
 ```sh
-helm install push-config-injecter pubsub-push-config-injecter \
+helm install push-config-injecter kerwood/pubsub-push-config-injecter \
   --namespace <your-namespace> \
   --set controller.tlsSecretName=push-config-injecter-certs \
   --set webhook.ca="$(cat certs/ca.crt)"
