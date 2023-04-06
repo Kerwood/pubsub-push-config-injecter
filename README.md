@@ -3,8 +3,8 @@
 
 ![Image Size](https://ghcr-badge.egpl.dev/kerwood/pubsub-push-config-injecter/size?tag=latest)
 
-When deploying a Google Cloud PubSubSubscription with a pushConfig using Config Connector in GKE the pushConfig endpoint can contain credentials of some sort.
-This little application is a Kubernetes Admission Controller that mutates the PubSubSubscription object and injects the pushConfig endpoint from a secret.
+When deploying a Google Cloud PubSubSubscription with a pushConfig using Config Connector in GKE, the `pushConfig.endpoint` value can contain credentials.
+This little application is a Kubernetes Admission Controller that mutates the PubSubSubscription object and injects the `pushConfig.endpoint` value from a secret.
 
 All you have to do is:
 - Create a secret with the endpoint URL.
@@ -23,7 +23,7 @@ For developing
  - Teleprecense, <https://www.getambassador.io/docs/telepresence/latest/install>
  - Rust, <https://www.rust-lang.org/tools/install>
  - Just, <https://github.com/casey/just>
- - OpenSSL 
+ - OpenSSL (*If you want to create a new CA*)
 
 
 ## Install with default CA certificates
@@ -41,6 +41,9 @@ helm install push-config-connector kerwood/pubsub-push-config-injecter \
 ```
 
 ## Install with your own CA certificates
+
+The application will create a new certificate and key from the CA every time it starts.
+The CA certificate and key therfore needs be mounted inside the pod. 
 
 Either bring your own cert and key or generate a new set with below command.
 ```sh
@@ -63,22 +66,22 @@ helm repo update
 Install with Helm and set the `tlsSecretName` and `webhook.ca`.
 ```sh
 helm install push-config-injecter kerwood/pubsub-push-config-injecter \
-  --namespace <your-namespace> \
   --set controller.tlsSecretName=push-config-injecter-certs \
-  --set webhook.ca="$(cat certs/ca.crt)"
+  --set webhook.ca="$(cat certs/ca.crt)" \
+  --namespace <your-namespace>
 ```
 
 ## How to use it?
 
-Add a label to a namespace and the controller will start intercepting PubSubSubscription kinds.
+Add a label to a namespace and the controller will start intercepting PubSubSubscription objects.
 ```sh
 kubectl label namespace <your-namepace> pubsub-push-config-injecter=enabled
 ```
 
-Create a secret with the endpoint value in the `default` namespace.
+Create a secret with the endpoint value in your desired namespace.
 ```sh
 kubectl create secret generic datadog-push-config \
-  --from-literal=endpoint=https://gcp-intake.logs.datadoghq.eu/api/v2/logs?dd-api-key=xxxxxxxxxxx \
+  --from-literal="endpoint=https://gcp-intake.logs.datadoghq.eu/api/v2/logs?dd-api-key=xxxxxxxxxxx" \
   --namespace default
 ```
 
@@ -117,16 +120,16 @@ Want to test it out locally, no problem.
 The Just file have different recipes to help with that.
 ```
 Available recipes:
-    all                        # Cluster up, generate certs, build dev image, deploy to kind and intercept traffic
-    build-image tag="latest"   # build container image for release
-    build-image-dev tag="dev"  # Build a dev image on debian:sid-slim
-    cluster-down               # Bring down the Kind cluster
-    cluster-up                 # Bring up the Kind cluster
-    deploy-dev tag="dev"       # Deploy Webhook, Certificates and Deployment to the Kind cluster
-    gen-ca                     # Genereate CA and certificate for the controller
-    load-image tag="dev"       # Load the container image into Kind
-    push-image tag="latest"    # build container image for release
-    tp-intercept               # Intercept webhook traffic from the Kind cluster
+    all                       # Cluster up, generate certs, build dev image, deploy to kind and intercept traffic
+    build-image tag="latest"  # build container image for release
+    build-image-dev tag="dev" # Build a dev image on debian:sid-slim
+    cluster-down              # Bring down the Kind cluster
+    cluster-up                # Bring up the Kind cluster
+    deploy-dev tag="dev"      # Deploy Webhook, Certificates and Deployment to the Kind cluster
+    gen-ca                    # Genereate CA and certificate for the controller
+    load-image tag="dev"      # Load the container image into Kind
+    push-image tag="latest"   # build container image for release
+    tp-intercept              # Intercept webhook traffic from the Kind cluster
 ```
 
 Make sure you have the prerequisites installed for developing and run `just all`.
