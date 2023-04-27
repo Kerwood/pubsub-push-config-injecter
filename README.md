@@ -87,6 +87,9 @@ kubectl create secret generic datadog-push-config \
 
 Add an annotation to your PubSubSubscription that points to the secret key that holds the endpoint value.
 The annotation value shold be `<namespace>/<secret-name>/<secret-key>`.
+
+You still need to add `spec.pushConfig.pushEndpoint` with a dummy value or else the subscription will not be
+created as a push subscription.
 ```yaml
 apiVersion: pubsub.cnrm.cloud.google.com/v1beta1
 kind: PubSubSubscription
@@ -95,6 +98,8 @@ metadata:
   annotations:
     pubsub-push-config/inject-from: default/datadog-push-config/endpoint
 spec:
+  pushConfig:
+    pushEndpoint: https://some-dummy-value-here
   topicRef:
     name: some-topic-name
 ```
